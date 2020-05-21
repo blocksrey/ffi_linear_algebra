@@ -69,9 +69,7 @@ function quat.slerp(a, b, t)
 		ay = -ay
 		az = -az
 	end
-
-
-
+	
 	local w = aw*bw + ax*bx + ay*by + az*bz
 	local x = aw*bx - ax*bw + ay*bz - az*by
 	local y = aw*by - ax*bz - ay*bw + az*bx

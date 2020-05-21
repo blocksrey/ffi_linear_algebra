@@ -147,6 +147,19 @@ function mat3.look(a, b)
 	end
 end
 
+function mat3.fromaxisangle(aa)
+	local x, y, z = aa:unit():dump()
+	local m = aa:magnitude()
+	local s = sin(m)
+	local c = cos(m)
+	local t = 1 - c
+	return new(
+		t*x*x + c  , t*x*y - z*s, t*x*z + y*s,
+		t*x*y + z*s, t*y*y + c  , t*y*z - x*s,
+		t*x*z - y*s, t*y*z + x*s, t*z*z + c  
+	)
+end
+
 function meta.__tostring(a)
 	return "mat3("..
 		a.xx..", "..a.yx..", "..a.zx..", "..
