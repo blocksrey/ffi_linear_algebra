@@ -1,44 +1,19 @@
-local ffi = require("ffi")
+local fficlass = require("fficlass")
 
-local rand = math.random
-local cos = math.cos
-local sin = math.sin
-local tau = 2*math.pi
-local ln = math.log
+local prop, meta = fficlass.new("typedef struct {float xx, yx, zx, xy, yy, zy, xz, yz, zz;} mat3;")
 
-ffi.cdef([[
-	typedef struct {
-		float
-			xx, yx, zx,
-			xy, yy, zy,
-			xz, yz, zz;
-	} mat3;
-]])
+local ctype = fficlass.ctype
+local new   = prop.new
+local rand  = math.random
+local cos   = math.cos
+local sin   = math.sin
+local ln    = math.log
 
-local function getctype(a)
-	local atype = type(a)
-	if atype == "cdata" then
-		return a.type
-	else
-		return atype
-	end
-end
+local tau   = 2*math.pi
 
-local mat3 = {}
-local meta = {}
-ffi.metatype("mat3", meta)
+prop.identity = new(1, 0, 0, 0, 1, 0, 0, 0, 1)
 
-local new = ffi.typeof("mat3")
---[[local function new(xx, yx, zx, xy, yy, zy, xz, yz, zz)
-	return ffi.new("mat3", xx, yx, zx, xy, yy, zy, xz, yz, zz)
-end]]
-
-mat3.type = "mat3"
-mat3.new = new
-
-meta.__index = mat3
-
-function mat3.transpose(a)
+function prop.transpose(a)
 	return new(
 		a.xx, a.xy, a.xz,
 		a.yx, a.yy, a.yz,
@@ -46,7 +21,7 @@ function mat3.transpose(a)
 	)
 end
 
-function mat3.inverse(a)
+function prop.inverse(a)
 	local det =
 		a.zx*(a.xy*a.yz - a.xz*a.yy) +
 		a.zy*(a.xz*a.yx - a.xx*a.yz) +
@@ -64,25 +39,25 @@ function mat3.inverse(a)
 	)
 end
 
-function mat3.trace(a)
+function prop.trace(a)
 	return a.xx + a.yy + a.zz
 end
 
-function mat3.det(a)
+function prop.det(a)
 	return
 		a.zx*(a.xy*a.yz - a.xz*a.yy) +
 		a.zy*(a.xz*a.yx - a.xx*a.yz) +
 		a.zz*(a.xx*a.yy - a.xy*a.yx)
 end
 
-function mat3.dump(a)
+function prop.dump(a)
 	return
 		a.xx, a.yx, a.zx,
 		a.xy, a.yy, a.zy,
 		a.xz, a.yz, a.zz
 end
 
-function mat3.fromeuleryxz(y, x, z)
+function prop.fromeuleryxz(y, x, z)
 	local cy, sy = cos(y), sin(y)
 	local cx, sx = cos(x), sin(x)
 	local cz, sz = cos(z), sin(z)
@@ -93,7 +68,7 @@ function mat3.fromeuleryxz(y, x, z)
 	)
 end
 
-function mat3.fromquat(q)
+function prop.fromquat(q)
 	local w, x, y, z = q:dump()
 	local d = w*w + x*x + y*y + z*z
 	return new(
@@ -103,7 +78,7 @@ function mat3.fromquat(q)
 	)
 end
 
-function mat3.random()
+function prop.random()
 	local l0 = ln(1 - rand())
 	local l1 = ln(1 - rand())
 	local a0 = tau*rand()
@@ -121,7 +96,7 @@ function mat3.random()
 	)
 end
 
-function mat3.look(a, b)
+function prop.look(a, b)
 	--a and b should be vec3s
 	local ax, ay, az = a:dump()
 	local bx, by, bz = b:dump()
@@ -147,7 +122,7 @@ function mat3.look(a, b)
 	end
 end
 
-function mat3.fromaxisangle(aa)
+function prop.fromaxisangle(aa)
 	local x, y, z = aa:unit():dump()
 	local m = aa:magnitude()
 	local s = sin(m)
@@ -192,15 +167,15 @@ function meta.__sub(a, b)
 end
 
 function meta.__mul(a, b)
-	local atype = getctype(a)
-	local btype = getctype(b)
+	local atype = ctype(a)
+	local btype = ctype(b)
 	if atype == "number" then
 		return new(
 			a*b.xx, a*b.yx, a*b.zx,
 			a*b.xy, a*b.yy, a*b.zy,
 			a*b.xz, a*b.yz, a*b.zz
 		)
-	else--mat3
+	else--prop
 		if btype == "number" then
 			return new(
 				a.xx*b, a.yx*b, a.zx*b,
@@ -213,7 +188,7 @@ function meta.__mul(a, b)
 				a.xy*b.x + a.yy*b.y + a.zy*b.z,
 				a.xz*b.x + a.yz*b.y + a.zz*b.z
 			)
-		else--mat3
+		else--prop
 			return new(
 				a.xx*b.xx + a.yx*b.xy + a.zx*b.xz,
 				a.xx*b.yx + a.yx*b.yy + a.zx*b.yz,
@@ -237,23 +212,4 @@ function meta.__div(a, b)
 	)
 end
 
-mat3.identity = new(1, 0, 0, 0, 1, 0, 0, 0, 1)
-
-return mat3
-
---[[
-transpose(mat3)
-inverse(mat3)
-trace(mat3)
-det(mat3)
-
-mat3 + mat3
-
-mat3*mat3
-mat3*vec3
-mat3*number
-number*mat3
-
-mat3/number
-
-]]
+return prop

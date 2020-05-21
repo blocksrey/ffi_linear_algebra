@@ -1,49 +1,27 @@
-local ffi = require("ffi")
+local fficlass = require("fficlass")
 
+local prop, meta = fficlass.new("typedef struct {float w, x, y, z;} quat;")
+
+local new  = prop.new
 local cos  = math.cos
 local sin  = math.sin
 local acos = math.acos
 local rand = math.random
 local ln   = math.log
 
---constants
-local tau  = 2*math.pi
+local tau = 2*math.pi
 
-ffi.cdef([[
-	typedef struct {
-		float w, x, y, z;
-	} quat;
-]])
+prop.identity = new(1, 0, 0, 0)
 
-local function getctype(a)
-	local atype = type(a)
-	if atype == "cdata" then
-		return a.type
-	else
-		return atype
-	end
-end
-
-local quat = {}
-local meta = {}
-ffi.metatype("quat", meta)
-
-local new = ffi.typeof("quat")
-
-quat.type = "quat"
-quat.new = new
-
-meta.__index = quat
-
-function quat.dump(q)
+function prop.dump(q)
 	return q.w, q.x, q.y, q.z
 end
 
-function quat.inverse(q)
+function prop.inverse(q)
 	return new(q.w, -q.x, -q.y, -q.z)
 end
 
-function quat.__mul(a, b)
+function prop.__mul(a, b)
 	return new(
 		a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,
 		a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y,
@@ -52,14 +30,14 @@ function quat.__mul(a, b)
 	)
 end
 
-function quat.__pow(q, n)
+function prop.__pow(q, n)
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	local t = n*acos(w)
 	local s = sin(t)/(x*x + y*y + z*z)^(1/2)
 	return new(cos(t), s*x, s*y, s*z)
 end
 
-function quat.slerp(a, b, t)
+function prop.slerp(a, b, t)
 	local aw, ax, ay, az = a:dump()
 	local bw, bx, by, bz = b:dump()
 
@@ -78,11 +56,11 @@ function quat.slerp(a, b, t)
 	local t = n*acos(w)
 	local s = sin(t)/(x*x + y*y + z*z)^(1/2)
 
-	local bw = cos(t)
-	local bx = s*x
-	local by = s*y
-	local bz = s*z
-
+	bw = cos(t)
+	bx = s*x
+	by = s*y
+	bz = s*z
+	
 	return new(
 		aw*bw - ax*bx - ay*by - az*bz,
 		aw*bx + ax*bw - ay*bz + az*by,
@@ -91,7 +69,7 @@ function quat.slerp(a, b, t)
 	)
 end
 
-function quat.fromaxisangle(v)
+function prop.fromaxisangle(v)
 	local x, y, z = v:dump()
 	local l = (x*x + y*y + z*z)^(1/2)
 	local x, y, z = x/l, y/l, z/l
@@ -99,19 +77,19 @@ function quat.fromaxisangle(v)
 	return new(cos(1/2*l), s*x, s*y, s*z)
 end
 
-function quat.fromeulerx(t)
+function prop.fromeulerx(t)
 	return new(cos(1/2*t), sin(1/2*t), 0, 0)
 end
 
-function quat.fromeulery(t)
+function prop.fromeulery(t)
 	return new(cos(1/2*t), 0, sin(1/2*t), 0)
 end
 
-function quat.fromeulerz(t)
+function prop.fromeulerz(t)
 	return new(cos(1/2*t), 0, 0, sin(1/2*t))
 end
 
-function quat.frommat3(m)
+function prop.frommat3(m)
 	local xx, yx, zx, xy, yy, zy, xz, yz, zz = m:dump()
 	if xx + yy + zz > 0 then
 		local s = 2*(1 + xx + yy + zz)^(1/2)
@@ -128,7 +106,7 @@ function quat.frommat3(m)
 	end
 end
 
-function quat.random()
+function prop.random()
 	local l0 = ln(1 - rand())
 	local l1 = ln(1 - rand())
 	local a0 = tau*rand()
@@ -143,7 +121,7 @@ function quat.random()
 	)
 end
 
-function quat.look(a, b)
+function prop.look(a, b)
 	--a and b should be vec3s
 	local ax, ay, az = a:dump()
 	local bx, by, bz = b:dump()
@@ -165,6 +143,4 @@ function quat.look(a, b)
 	end
 end
 
-quat.identity = new(1, 0, 0, 0)
-
-return quat
+return prop
