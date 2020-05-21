@@ -167,7 +167,7 @@ function meta.__sub(a, b)
 end
 
 function meta.__mul(a, b)
-	local atype = ctype(a)
+	local atype = type(a)
 	local btype = ctype(b)
 	if atype == "number" then
 		return new(

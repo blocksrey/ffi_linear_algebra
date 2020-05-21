@@ -2,8 +2,7 @@ local fficlass = require("fficlass")
 
 local prop, meta = fficlass.new("typedef struct {float x, y, z;} vec3;")
 
-local ctype = fficlass.ctype
-local new   = prop.new
+local new = prop.new
 
 local null = new(0, 0, 0)
 
@@ -67,7 +66,7 @@ function meta.__sub(a, b)
 end
 
 function meta.__mul(a, b)
-	local atype = ctype(a)
+	local atype = type(a)
 	if atype == "number" then
 		return new(a*b.x, a*b.y, a*b.z)
 	else
