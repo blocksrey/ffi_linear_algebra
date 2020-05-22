@@ -9,7 +9,7 @@ local cos   = math.cos
 local sin   = math.sin
 local ln    = math.log
 
-local tau   = 2*math.pi
+local tau = 2*math.pi
 
 prop.identity = new(1, 0, 0, 0, 1, 0, 0, 0, 1)
 
