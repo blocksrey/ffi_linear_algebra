@@ -26,6 +26,11 @@ end
 
 function prop.unit(a)
 	local l = (a.x*a.x + a.y*a.y + a.z*a.z)^(1/2)
+	return new(a.x/l, a.y/l, a.z/l)
+end
+
+function prop.safeunit(a)
+	local l = (a.x*a.x + a.y*a.y + a.z*a.z)^(1/2)
 	if l > 0 then
 		return new(a.x/l, a.y/l, a.z/l)
 	else
@@ -35,18 +40,6 @@ end
 
 function prop.dump(a)
 	return a.x, a.y, a.z
-end
-
-function meta.__tostring(a)
-	return "vec3("..a.x..", "..a.y..", "..a.z..")"
-end
-
-function meta.__unm(a)
-	return new(
-		-a.x,
-		-a.y,
-		-a.z
-	)
 end
 
 function meta.__add(a, b)
@@ -80,6 +73,18 @@ end
 
 function meta.__div(a, b)
 	return new(a.x/b, a.y/b, a.z/b)
+end
+
+function meta.__unm(a)
+	return new(
+		-a.x,
+		-a.y,
+		-a.z
+	)
+end
+
+function meta.__tostring(a)
+	return "vec3("..a.x..", "..a.y..", "..a.z..")"
 end
 
 return prop

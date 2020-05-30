@@ -6,35 +6,15 @@ local new  = prop.new
 local cos  = math.cos
 local sin  = math.sin
 local acos = math.acos
-local rand = math.random
 local ln   = math.log
+local rand = math.random
 
 local tau = 2*math.pi
 
 prop.identity = new(1, 0, 0, 0)
 
-function prop.dump(q)
-	return q.w, q.x, q.y, q.z
-end
-
 function prop.inverse(q)
 	return new(q.w, -q.x, -q.y, -q.z)
-end
-
-function prop.__mul(a, b)
-	return new(
-		a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,
-		a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y,
-		a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x,
-		a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w
-	)
-end
-
-function prop.__pow(q, n)
-	local w, x, y, z = q.w, q.x, q.y, q.z
-	local t = n*acos(w)
-	local s = sin(t)/(x*x + y*y + z*z)^(1/2)
-	return new(cos(t), s*x, s*y, s*z)
 end
 
 function prop.slerp(a, b, t)
@@ -69,14 +49,6 @@ function prop.slerp(a, b, t)
 	)
 end
 
-function prop.fromaxisangle(v)
-	local x, y, z = v:dump()
-	local l = (x*x + y*y + z*z)^(1/2)
-	local x, y, z = x/l, y/l, z/l
-	local s = sin(1/2*l)
-	return new(cos(1/2*l), s*x, s*y, s*z)
-end
-
 function prop.fromeulerx(t)
 	return new(cos(1/2*t), sin(1/2*t), 0, 0)
 end
@@ -106,21 +78,6 @@ function prop.frommat3(m)
 	end
 end
 
-function prop.random()
-	local l0 = ln(1 - rand())
-	local l1 = ln(1 - rand())
-	local a0 = tau*rand()
-	local a1 = tau*rand()
-	local m0 = (l0/(l0 + l1))^0.5
-	local m1 = (l1/(l0 + l1))^0.5
-	return new(
-		m0*cos(a0),
-		m0*sin(a0),
-		m1*cos(a1),
-		m1*sin(a1)
-	)
-end
-
 function prop.look(a, b)
 	--a and b should be vec3s
 	local ax, ay, az = a:dump()
@@ -141,6 +98,49 @@ function prop.look(a, b)
 			z/q
 		)
 	end
+end
+
+function prop.fromaxisangle(v)
+	local x, y, z = v:dump()
+	local l = (x*x + y*y + z*z)^(1/2)
+	local x, y, z = x/l, y/l, z/l
+	local s = sin(1/2*l)
+	return new(cos(1/2*l), s*x, s*y, s*z)
+end
+
+function prop.random()
+	local l0 = ln(1 - rand())
+	local l1 = ln(1 - rand())
+	local a0 = tau*rand()
+	local a1 = tau*rand()
+	local m0 = (l0/(l0 + l1))^0.5
+	local m1 = (l1/(l0 + l1))^0.5
+	return new(
+		m0*cos(a0),
+		m0*sin(a0),
+		m1*cos(a1),
+		m1*sin(a1)
+	)
+end
+
+function prop.dump(q)
+	return q.w, q.x, q.y, q.z
+end
+
+function prop.__mul(a, b)
+	return new(
+		a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,
+		a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y,
+		a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x,
+		a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w
+	)
+end
+
+function prop.__pow(q, n)
+	local w, x, y, z = q.w, q.x, q.y, q.z
+	local t = n*acos(w)
+	local s = sin(t)/(x*x + y*y + z*z)^(1/2)
+	return new(cos(t), s*x, s*y, s*z)
 end
 
 return prop

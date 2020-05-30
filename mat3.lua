@@ -4,22 +4,14 @@ local prop, meta = fficlass.new("typedef struct {float xx, yx, zx, xy, yy, zy, x
 
 local ctype = fficlass.ctype
 local new   = prop.new
-local rand  = math.random
 local cos   = math.cos
 local sin   = math.sin
 local ln    = math.log
+local rand  = math.random
 
 local tau = 2*math.pi
 
 prop.identity = new(1, 0, 0, 0, 1, 0, 0, 0, 1)
-
-function prop.transpose(a)
-	return new(
-		a.xx, a.xy, a.xz,
-		a.yx, a.yy, a.yz,
-		a.zx, a.zy, a.zz
-	)
-end
 
 function prop.inverse(a)
 	local det =
@@ -39,8 +31,12 @@ function prop.inverse(a)
 	)
 end
 
-function prop.trace(a)
-	return a.xx + a.yy + a.zz
+function prop.transpose(a)
+	return new(
+		a.xx, a.xy, a.xz,
+		a.yx, a.yy, a.yz,
+		a.zx, a.zy, a.zz
+	)
 end
 
 function prop.det(a)
@@ -50,11 +46,8 @@ function prop.det(a)
 		a.zz*(a.xx*a.yy - a.xy*a.yx)
 end
 
-function prop.dump(a)
-	return
-		a.xx, a.yx, a.zx,
-		a.xy, a.yy, a.zy,
-		a.xz, a.yz, a.zz
+function prop.trace(a)
+	return a.xx + a.yy + a.zz
 end
 
 function prop.fromeuleryxz(y, x, z)
@@ -75,24 +68,6 @@ function prop.fromquat(q)
 		2*(w*w + x*x)/d - 1, 2*(x*y - z*w)/d,     2*(x*z + y*w)/d,
 		2*(x*y + z*w)/d,     2*(w*w + y*y)/d - 1, 2*(y*z - x*w)/d,
 		2*(x*z - y*w)/d,     2*(y*z + x*w)/d,     2*(w*w + z*z)/d - 1
-	)
-end
-
-function prop.random()
-	local l0 = ln(1 - rand())
-	local l1 = ln(1 - rand())
-	local a0 = tau*rand()
-	local a1 = tau*rand()
-	local m0 = (l0/(l0 + l1))^0.5
-	local m1 = (l1/(l0 + l1))^0.5
-	local w = m0*cos(a0)
-	local x = m0*sin(a0)
-	local y = m1*cos(a1)
-	local z = m1*sin(a1)
-	return new(
-		2*(w*w + x*x) - 1, 2*(x*y - z*w),     2*(x*z + y*w),
-		2*(x*y + z*w),     2*(w*w + y*y) - 1, 2*(y*z - x*w),
-		2*(x*z - y*w),     2*(y*z + x*w),     2*(w*w + z*z) - 1
 	)
 end
 
@@ -135,19 +110,29 @@ function prop.fromaxisangle(aa)
 	)
 end
 
-function meta.__tostring(a)
-	return "mat3("..
-		a.xx..", "..a.yx..", "..a.zx..", "..
-		a.xy..", "..a.yy..", "..a.zy..", "..
-		a.xz..", "..a.yz..", "..a.zz..")"
+function prop.random()
+	local l0 = ln(1 - rand())
+	local l1 = ln(1 - rand())
+	local a0 = tau*rand()
+	local a1 = tau*rand()
+	local m0 = (l0/(l0 + l1))^0.5
+	local m1 = (l1/(l0 + l1))^0.5
+	local w = m0*cos(a0)
+	local x = m0*sin(a0)
+	local y = m1*cos(a1)
+	local z = m1*sin(a1)
+	return new(
+		2*(w*w + x*x) - 1, 2*(x*y - z*w),     2*(x*z + y*w),
+		2*(x*y + z*w),     2*(w*w + y*y) - 1, 2*(y*z - x*w),
+		2*(x*z - y*w),     2*(y*z + x*w),     2*(w*w + z*z) - 1
+	)
 end
 
-function meta.__unm(a)
-	return new(
-		-a.xx, -a.yx, -a.zx,
-		-a.xy, -a.yy, -a.zy,
-		-a.xz, -a.yz, -a.zz
-	)
+function prop.dump(a)
+	return
+		a.xx, a.yx, a.zx,
+		a.xy, a.yy, a.zy,
+		a.xz, a.yz, a.zz
 end
 
 function meta.__add(a, b)
@@ -210,6 +195,21 @@ function meta.__div(a, b)
 		a.xy/b, a.yy/b, a.zy/b,
 		a.xz/b, a.yz/b, a.zz/b
 	)
+end
+
+function meta.__unm(a)
+	return new(
+		-a.xx, -a.yx, -a.zx,
+		-a.xy, -a.yy, -a.zy,
+		-a.xz, -a.yz, -a.zz
+	)
+end
+
+function meta.__tostring(a)
+	return "mat3("..
+		a.xx..", "..a.yx..", "..a.zx..", "..
+		a.xy..", "..a.yy..", "..a.zy..", "..
+		a.xz..", "..a.yz..", "..a.zz..")"
 end
 
 return prop
