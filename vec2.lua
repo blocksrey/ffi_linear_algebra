@@ -1,40 +1,40 @@
 local fficlass = require("fficlass")
 
-local prop, meta = fficlass.new("typedef struct {float x, y;} vec2;")
+local vec2, meta = fficlass.new("typedef struct {float x, y;} vec2;")
 
-local new = prop.new
+local new = vec2.new
+local sqrt = math.sqrt
 
 local null = new(0, 0)
 
-prop.null = null
+vec2.null = null
 
-function prop.dot(a, b)
+function vec2.dot(a, b)
 	return a.x*b.x + a.y*b.y
 end
 
-function prop.cross(a)
+function vec2.perp(a)
 	return new(x, -y)
 end
 
-function prop.magnitude(a)
-	return (a.x*a.x + a.y*a.y)^(1/2)
+function vec2.magnitude(a)
+	return sqrt(a.x*a.x + a.y*a.y)
 end
 
-function prop.unit(a)
-	local l = (a.x*a.x + a.y*a.y)^(1/2)
+function vec2.positiveUnit(a)
+	local l = sqrt(a.x*a.x + a.y*a.y)
 	return new(a.x/l, a.y/l)
 end
 
-function prop.safeunit(a)
-	local l = (a.x*a.x + a.y*a.y)^(1/2)
+function vec2.unit(a)
+	local l = sqrt(a.x*a.x + a.y*a.y)
 	if l > 0 then
 		return new(a.x/l, a.y/l)
-	else
-		return null
 	end
+	return null
 end
 
-function prop.dump(a)
+function vec2.dump(a)
 	return a.x, a.y
 end
 
@@ -69,14 +69,11 @@ function meta.__div(a, b)
 end
 
 function meta.__unm(a)
-	return new(
-		-a.x,
-		-a.y
-	)
+	return new(-a.x, -a.y)
 end
 
 function meta.__tostring(a)
 	return "vec2("..a.x..", "..a.y..")"
 end
 
-return prop
+return vec2

@@ -1,18 +1,19 @@
 local fficlass = require("fficlass")
 
-local prop, meta = fficlass.new("typedef struct {float x, y, z;} vec3;")
+local vec3, meta = fficlass.new("typedef struct {float x, y, z;} vec3;")
 
-local new = prop.new
+local new = vec3.new
+local sqrt = math.sqrt
 
 local null = new(0, 0, 0)
 
-prop.null = null
+vec3.null = null
 
-function prop.dot(a, b)
+function vec3.dot(a, b)
 	return a.x*b.x + a.y*b.y + a.z*b.z
 end
 
-function prop.cross(a, b)
+function vec3.cross(a, b)
 	return new(
 		a.y*b.z - a.z*b.y,
 		a.z*b.x - a.x*b.z,
@@ -20,25 +21,24 @@ function prop.cross(a, b)
 	)
 end
 
-function prop.magnitude(a)
-	return (a.x*a.x + a.y*a.y + a.z*a.z)^(1/2)
+function vec3.magnitude(a)
+	return sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
 end
 
-function prop.unit(a)
-	local l = (a.x*a.x + a.y*a.y + a.z*a.z)^(1/2)
+function vec3.positiveUnit(a)
+	local l = sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
 	return new(a.x/l, a.y/l, a.z/l)
 end
 
-function prop.safeunit(a)
-	local l = (a.x*a.x + a.y*a.y + a.z*a.z)^(1/2)
+function vec3.unit(a)
+	local l = sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
 	if l > 0 then
 		return new(a.x/l, a.y/l, a.z/l)
-	else
-		return null
 	end
+	return null
 end
 
-function prop.dump(a)
+function vec3.dump(a)
 	return a.x, a.y, a.z
 end
 
@@ -76,15 +76,11 @@ function meta.__div(a, b)
 end
 
 function meta.__unm(a)
-	return new(
-		-a.x,
-		-a.y,
-		-a.z
-	)
+	return new(-a.x, -a.y, -a.z)
 end
 
 function meta.__tostring(a)
 	return "vec3("..a.x..", "..a.y..", "..a.z..")"
 end
 
-return prop
+return vec3
