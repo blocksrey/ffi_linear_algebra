@@ -104,7 +104,7 @@ end
 
 function quat.fromAxisAngle(v)
 	local x, y, z = v:dump()
-	local l = (x*x + y*y + z*z)
+	local l = sqrt(x*x + y*y + z*z)
 	local x, y, z = x/l, y/l, z/l
 	local s = sin(0.5*l)
 	return new(cos(0.5*l), s*x, s*y, s*z)
@@ -141,7 +141,7 @@ end
 function meta.__pow(q, n)
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	local t = n*acos(w)
-	local s = sin(t)/(x*x + y*y + z*z)
+	local s = sin(t)/sqrt(x*x + y*y + z*z)
 	return new(cos(t), s*x, s*y, s*z)
 end
 
