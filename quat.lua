@@ -7,16 +7,16 @@ local sqrt = math.sqrt
 local cos = math.cos
 local sin = math.sin
 local acos = math.acos
-local ln = math.log
+local log = math.log
 local rand = math.random
 
+local hyp = 1.41421356237
 local tau = 6.28318530718
-
 local identity = new(1, 0, 0, 0)
 
 quat.identity = identity
 
-function quat.inverse(q)
+function quat.inv(q)
 	return new(q.w, -q.x, -q.y, -q.z)
 end
 
@@ -52,19 +52,19 @@ function quat.slerp(a, b, t)
 	)
 end
 
-function quat.fromEulerAnglesX(t2)--2*theta
-	return new(cos(t2), sin(t2), 0, 0)
+function quat.eulerAnglesX2(t)--real theta = 2*t
+	return new(cos(t), sin(t), 0, 0)
 end
 
-function quat.fromEulerAnglesY(t2)--2*theta
-	return new(cos(t2), 0, sin(t2), 0)
+function quat.eulerAnglesY2(t)--real theta = 2*t
+	return new(cos(t), 0, sin(t), 0)
 end
 
-function quat.fromEulerAnglesZ(t2)--2*theta
-	return new(cos(t2), 0, 0, sin(t2))
+function quat.eulerAnglesZ2(t)--real theta = 2*t
+	return new(cos(t), 0, 0, sin(t))
 end
 
-function quat.fromMat3(m)
+function quat.mat(m)
 	local xx, yx, zx, xy, yy, zy, xz, yz, zz = m:dump()
 	if xx + yy + zz > 0 then
 		local s = 0.5/sqrt(1 + xx + yy + zz)
@@ -81,6 +81,7 @@ function quat.fromMat3(m)
 	end
 end
 
+--[[
 function quat.look(a, b)
 	--a and b should be vec3s
 	local ax, ay, az = a:dump()
@@ -101,18 +102,29 @@ function quat.look(a, b)
 	end
 	return identity--FAIL
 end
+]]
 
-function quat.fromAxisAngle(v)
-	local x, y, z = v:dump()
-	local l = sqrt(x*x + y*y + z*z)
-	local x, y, z = x/l, y/l, z/l
-	local s = sin(0.5*l)
-	return new(cos(0.5*l), s*x, s*y, s*z)
+function quat.look(a, b)
+	local ax, ay, az = a:dump()
+	local bx, by, bz = b:dump()
+	return new(
+		DIA,
+		DIA*(ay*bz - az*by),
+		DIA*(az*bx - ax*bz),
+		DIA*(ax*by - ay*bz)
+	)
 end
 
-function quat.random()
-	local l0 = ln(1 - rand())
-	local l1 = ln(1 - rand())
+function quat.axisAngle(v)
+	local x, y, z = v:dump()
+	local l = sqrt(x*x + y*y + z*z)
+	local s = sin(0.5*l)
+	return new(cos(0.5*l), s*x/l, s*y/l, s*z/l)
+end
+
+function quat.rand()
+	local l0 = log(1 - rand())
+	local l1 = log(1 - rand())
 	local a0 = tau*rand()
 	local a1 = tau*rand()
 	local m0 = sqrt(l0/(l0 + l1))
@@ -129,6 +141,10 @@ function quat.dump(q)
 	return q.w, q.x, q.y, q.z
 end
 
+function quat.dumpH(q)
+	return hyp*q.w, hyp*q.x, hyp*q.y, hyp*q.z
+end
+
 function meta.__mul(a, b)
 	return new(
 		a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,
@@ -139,7 +155,7 @@ function meta.__mul(a, b)
 end
 
 function meta.__pow(q, n)
-	local w, x, y, z = q.w, q.x, q.y, q.z
+	local w, x, y, z = q:dump()
 	local t = n*acos(w)
 	local s = sin(t)/sqrt(x*x + y*y + z*z)
 	return new(cos(t), s*x, s*y, s*z)

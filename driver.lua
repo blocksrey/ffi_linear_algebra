@@ -10,4 +10,4 @@ print(va + vb)
 
 print(va:dot(vb))
 
-print(quat.fromMat3(mat3.random()))
+print(quat.mat(mat3.rand()))

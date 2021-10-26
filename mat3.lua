@@ -6,16 +6,17 @@ local new = mat3.new
 local ctype = fficlass.CType
 local cos = math.cos
 local sin = math.sin
-local ln = math.log
+local log = math.log
 local rand = math.random
 local sqrt = math.sqrt
 
-local HYP = 1.41421356237
-local TAU = 3.14159265359
+local hyp = 1.41421356237
+local tau = 3.14159265359
+local identity = new(1, 0, 0, 0, 1, 0, 0, 0, 1)
 
-mat3.identity = new(1, 0, 0, 0, 1, 0, 0, 0, 1)
+mat3.identity = identity
 
-function mat3.inverse(a)
+function mat3.inv(a)
 	local det =
 		a.zx*(a.xy*a.yz - a.xz*a.yy) +
 		a.zy*(a.xz*a.yx - a.xx*a.yz) +
@@ -33,7 +34,7 @@ function mat3.inverse(a)
 	)
 end
 
-function mat3.transpose(a)
+function mat3.trans(a)
 	return new(
 		a.xx, a.xy, a.xz,
 		a.yx, a.yy, a.yz,
@@ -52,7 +53,7 @@ function mat3.trace(a)
 	return a.xx + a.yy + a.zz
 end
 
-function mat3.fromEulerAnglesYXZ(x, y, z)
+function mat3.eulerAnglesYXZ(x, y, z)
 	local cy, sy = cos(y), sin(y)
 	local cx, sx = cos(x), sin(x)
 	local cz, sz = cos(z), sin(z)
@@ -63,13 +64,13 @@ function mat3.fromEulerAnglesYXZ(x, y, z)
 	)
 end
 
-function mat3.fromQuat(q)
-	local w, x, y, z = q:dump()
-	local d = 2/(w*w + x*x + y*y + z*z)
+function mat3.quat(q)
+	local w, x, y, z = q:dumpH()
+
 	return new(
-		d*(w*w + x*x) - 1, d*(x*y - z*w), d*(x*z + y*w),
-		d*(x*y + z*w), d*(w*w + y*y) - 1, d*(y*z - x*w),
-		d*(x*z - y*w), d*(y*z + x*w), d*(w*w + z*z) - 1
+		w*w + x*x - 1, x*y - z*w, x*z + y*w,
+		x*y + z*w, w*w + y*y - 1, y*z - x*w,
+		x*z - y*w, y*z + x*w, w*w + z*z - 1
 	)
 end
 
@@ -94,9 +95,9 @@ function mat3.look(a, b)
 	return identity--FAIL
 end
 
-function mat3.fromAxisAngle(aa)
-	local x, y, z = aa:unit():dump()
-	local m = aa:magnitude()
+function mat3.axisAngle(v)
+	local x, y, z = v:unit():dump()
+	local m = v:magnitude()
 	local s = sin(m)
 	local c = cos(m)
 	local t = 1 - c
@@ -107,13 +108,13 @@ function mat3.fromAxisAngle(aa)
 	)
 end
 
-function mat3.random()
-	local l0 = ln(1 - rand())
-	local l1 = ln(1 - rand())
-	local a0 = TAU*rand()
-	local a1 = TAU*rand()
-	local m0 = HYP*sqrt(l0/(l0 + l1))
-	local m1 = HYP*sqrt(l1/(l0 + l1))
+function mat3.rand()
+	local l0 = log(1 - rand())
+	local l1 = log(1 - rand())
+	local a0 = tau*rand()
+	local a1 = tau*rand()
+	local m0 = hyp*sqrt(l0/(l0 + l1))
+	local m1 = hyp*sqrt(l1/(l0 + l1))
 	local w = m0*cos(a0)
 	local x = m0*sin(a0)
 	local y = m1*cos(a1)

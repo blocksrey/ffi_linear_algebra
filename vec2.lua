@@ -17,11 +17,11 @@ function vec2.perp(a)
 	return new(x, -y)
 end
 
-function vec2.magnitude(a)
+function vec2.norm(a)
 	return sqrt(a.x*a.x + a.y*a.y)
 end
 
-function vec2.positiveUnit(a)
+function vec2.posUnit(a)
 	local l = sqrt(a.x*a.x + a.y*a.y)
 	return new(a.x/l, a.y/l)
 end

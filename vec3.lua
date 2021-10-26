@@ -21,15 +21,18 @@ function vec3.cross(a, b)
 	)
 end
 
-function vec3.magnitude(a)
+--magnitude of vector
+function vec3.norm(a)
 	return sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
 end
 
-function vec3.positiveUnit(a)
+--unitize assuming norm > 0
+function vec3.posUnit(a)
 	local l = sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
 	return new(a.x/l, a.y/l, a.z/l)
 end
 
+--unitize no assumptions
 function vec3.unit(a)
 	local l = sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
 	if l > 0 then
@@ -40,6 +43,28 @@ end
 
 function vec3.dump(a)
 	return a.x, a.y, a.z
+end
+
+function vec3.quat(q)
+	local i, j, k = self:dump()
+	local w, x, y, z = q:dumpH()
+
+	return new(
+		i*(1 - y*y - z*z) + j*(x*y - w*z) + k*(x*z + w*y),
+		i*(x*y + w*z) + j*(1 - x*x - z*z) + k*(y*z - w*x),
+		i*(x*z - w*y) + j*(y*z + w*x) + k*(1 - x*x - y*y)
+	)
+end
+
+function vec3.invQuat(q)
+	local i, j, k = self:dump()
+	local w, x, y, z = q:dumpH()
+
+	return new(
+		i*(1 - y*y - z*z) + j*(x*y + w*z) + k*(x*z - w*y),
+		i*(x*y - w*z) + j*(1 - x*x - z*z) + k*(y*z + w*x),
+		i*(x*z + w*y) + j*(y*z - w*x) + k*(1 - x*x - y*y)
+	)
 end
 
 function meta.__add(a, b)
