@@ -21,6 +21,10 @@ function vec3.cross(a, b)
 	)
 end
 
+function vec3.square(a)
+	return a.x*a.x + a.y*a.y + a.z*a.z
+end
+
 --magnitude of vector
 function vec3.norm(a)
 	return sqrt(a.x*a.x + a.y*a.y + a.z*a.z)
