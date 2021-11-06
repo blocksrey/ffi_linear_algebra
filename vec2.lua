@@ -17,6 +17,10 @@ function vec2.perp(a)
 	return new(x, -y)
 end
 
+function vec2.square(a)
+	return a.x*a.x + a.y*a.y
+end
+
 function vec2.norm(a)
 	return sqrt(a.x*a.x + a.y*a.y)
 end
