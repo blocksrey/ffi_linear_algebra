@@ -1,0 +1,7 @@
+Puniko Software License 1.0
+
+Copyright (c) 2022, Jeffrey Skinner <jeff@je.gy>
+
+Under the Puniko Software License, you are granted a non-exclusive, non-transferable license to use this software solely for your own personal use. You may not share, rent, lease, sell, redistribute, or sublicense this software.
+
+More information at http://je.gy

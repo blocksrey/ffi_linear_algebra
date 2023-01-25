@@ -1,37 +1,35 @@
-local ffi = require("ffi")
-
-local type = type
+local ffi = require('ffi')
 
 local fficlass = {}
 
 local function getcdeftype(cdefstr)
 	for i = #cdefstr, 1, -1 do
-		if cdefstr:sub(i, i) == " " then
+		if cdefstr:sub(i, i) == ' ' then
 			return cdefstr:sub(i + 1, #cdefstr - 1)
 		end
 	end
 end
 
 function fficlass.new(cdefstr)
-	local class = {}
-	local meta = {}
-
 	local cdeftype = getcdeftype(cdefstr)
 
-	ffi.cdef(cdefstr)
-	ffi.metatype(cdeftype, meta)
+	local class = {}
 
+	ffi.cdef(cdefstr)
+	ffi.metatype(cdeftype, class)
+
+	class.__index = class
 	class.new = ffi.typeof(cdeftype)
 	class.type = cdeftype
 
-	meta.__index = class
-
-	return class, meta
+	return class
 end
 
-function fficlass.CType(a)
-	local atype = type(a)
-	return atype == "cdata" and a.type or atype
+--[[
+function fficlass:CType()
+	--local type = type(self)
+	--return type == 'cdata' and self.type or type
 end
+]]
 
 return fficlass
