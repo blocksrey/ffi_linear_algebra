@@ -1,4 +1,4 @@
-local fficlass = require('linearalgebra/fficlass')
+local fficlass = require('fficlass')
 
 local vec3 = fficlass.new('typedef struct {float x, y, z;} vec3;')
 
@@ -37,21 +37,13 @@ end
 function vec3.quat(v, q)
 	local i, j, k = v:dump()
 	local x, y, z, w = q:dumpH()
-	return new(
-		i*(1 - y*y - z*z) + j*(x*y - w*z) + k*(x*z + w*y), 
-		i*(x*y + w*z) + j*(1 - x*x - z*z) + k*(y*z - w*x), 
-		i*(x*z - w*y) + j*(y*z + w*x) + k*(1 - x*x - y*y)
-	)
+	return new(i*(1 - y*y - z*z) + j*(x*y - w*z) + k*(x*z + w*y), i*(x*y + w*z) + j*(1 - x*x - z*z) + k*(y*z - w*x), i*(x*z - w*y) + j*(y*z + w*x) + k*(1 - x*x - y*y))
 end
 
 function vec3.quatI(v, q)
 	local i, j, k = v:dump()
 	local x, y, z, w = q:dumpH()
-	return new(
-		i*(1 - y*y - z*z) + j*(x*y + w*z) + k*(x*z - w*y), 
-		i*(x*y - w*z) + j*(1 - x*x - z*z) + k*(y*z + w*x), 
-		i*(x*z + w*y) + j*(y*z - w*x) + k*(1 - x*x - y*y)
-	)
+	return new(i*(1 - y*y - z*z) + j*(x*y + w*z) + k*(x*z - w*y), i*(x*y - w*z) + j*(1 - x*x - z*z) + k*(y*z + w*x), i*(x*z + w*y) + j*(y*z - w*x) + k*(1 - x*x - y*y))
 end
 
 function vec3.__mul(a, b)
@@ -60,11 +52,7 @@ function vec3.__mul(a, b)
 	elseif type(b) == 'cdata' then
 		return new(a.x*b.x, a.y*b.y, a.z*b.z)
 	else
-		return new(
-			a.xx*b.x + a.yx*b.y + a.zx*b.z, 
-			a.xy*b.x + a.yy*b.y + a.zy*b.z, 
-			a.xz*b.x + a.yz*b.y + a.zz*b.z
-		)
+		return new(a.xx*b.x + a.yx*b.y + a.zx*b.z, a.xy*b.x + a.yy*b.y + a.zy*b.z, a.xz*b.x + a.yz*b.y + a.zz*b.z)
 	end
 end
 

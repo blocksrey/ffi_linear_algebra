@@ -1,4 +1,4 @@
-local fficlass = require('linearalgebra/fficlass')
+local fficlass = require('fficlass')
 
 local vec2 = fficlass.new('typedef struct {float x, y;} vec2;')
 

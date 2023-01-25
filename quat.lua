@@ -1,4 +1,4 @@
-local fficlass = require('linearalgebra/fficlass')
+local fficlass = require('fficlass')
 
 local quat = fficlass.new('typedef struct {float x, y, z, w;} quat;')
 
